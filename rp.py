@@ -9,9 +9,9 @@ import json
 
 def getUserLevel(cursus):
 	for i in range(len(cursus)):
-		if (cursus[i]["id"] == 283777): # main 42 cursus
+		if (cursus[i]["id"] == 283777): # main 42 cursus (not sus at all)
 			return cursus[i]["level"]
-	return 0
+	return 0 # level 0 is pretty sus ngl
 
 
 
@@ -66,20 +66,20 @@ print("RPC is online")
 cursus = user["cursus_users"]
 
 
-user_lvl = "user level: " + str(getUserLevel(cursus))
-wallet = "wallet: " + str(user["wallet"])
-state = "location: " + (user["location"] or "unavailable")
-rank = "rank: " + str(user["kind"])
+user_lvl = "sus level: " + str(getUserLevel(cursus)) + " 📮"
+wallet = "wallet: " + str(user["wallet"]) + " coins (kinda sus)"
+state = "sus location: " + (user["location"] or "hiding in vents 👀")
+rank = "role: " + str(user["kind"]) + " (not the impostor)"
 pp = user["image"]["link"] # your intra picture
 
 RPC.update(
 	details=state,
-	state=user_lvl,
+	state=user_lvl + " | Acting sus at 42 🔍",
 	start=start,
 	large_image = "42", # big 42 image
 	small_image=pp,
 )
-print("RPC is setup")
+print("RPC is setup - looking pretty sus 😎")
 
 while True:
 	time.sleep(15)
