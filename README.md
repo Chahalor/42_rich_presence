@@ -1,5 +1,5 @@
-# RP42
-rp42 will enable discord reach presence
+# RP42 📮
+rp42 will enable discord reach presence (now with 100% more sus!)
 
 
 ## setup
@@ -57,14 +57,20 @@ bash stop.sh
 
 ## Customisation
 inside the rp.py you can choose which infos are display:   
-these are some basic one
+these are some basic one (now with extra sus! 📮)
 ```
-- login      // your login + title
-- wallet     // wallet amount
-- state      // where are you connected in the cluster
-- rank       // are you a student / trancender / etc...
+- login      // your login + title  
+- wallet     // wallet amount (kinda sus)
+- state      // where are you connected in the cluster (or hiding in vents)
+- rank       // are you a student / trancender / etc... (not the impostor)
 - pp         // your intra profil picture
 ```
 you can make your own varaible using the `user` variable 
 
 inside `RPC.update()` choose what to display and where
+
+**🔍 Sus Features Added:**
+- All status messages now include Among Us themed references
+- Location shows "hiding in vents" when unavailable  
+- Level display includes sus emojis
+- Acting sus at 42 school indicator
