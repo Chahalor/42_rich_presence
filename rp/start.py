@@ -1,6 +1,8 @@
 import os, sys, socket
 import time
 import rp
+from pypresence import Presence
+
 
 SOCKET_PATH = "/tmp/rich_presence.sock"
 PID_FILE = "/tmp/rich_presence.pid"
@@ -13,6 +15,12 @@ def _mute_streams():
 	with open("/dev/null", "ab", 0) as f:
 		os.dup2(f.fileno(), sys.stdout.fileno())
 		os.dup2(f.fileno(), sys.stderr.fileno())
+
+def _update_presence():
+	if not rp.rpc:
+		rp.rpc = Presence("1383806236763623496")
+	rp.connect()
+	rp.update(state=rp.config.state, details=rp.config.details, start=rp.config.start, large_image=rp.config.large_image, large_text=rp.config.large_text)
 
 def _handle_order(order: str):
 	if order == "stop":
