@@ -1,11 +1,8 @@
-import os, sys, socket
-import time
-import rp
+import os, sys, socket, time
+from xmlrpc import server
 from pypresence import Presence
-
-
-SOCKET_PATH = "/tmp/rich_presence.sock"
-PID_FILE = "/tmp/rich_presence.pid"
+import rp
+from rp.connect import RPCNotConnectedError
 
 def _mute_streams():
 	sys.stdout.flush()
@@ -17,32 +14,38 @@ def _mute_streams():
 		os.dup2(f.fileno(), sys.stderr.fileno())
 
 def _update_presence():
-	if not rp.rpc:
-		rp.rpc = Presence("1383806236763623496")
-	rp.connect()
-	rp.update(state=rp.config.state, details=rp.config.details, start=rp.config.start, large_image=rp.config.large_image, large_text=rp.config.large_text)
+	try:
+		rp.update()
+	except RPCNotConnectedError:
+		try:
+			rp.connect()
+			rp.update()
+		except Exception as e:
+			with open("/tmp/rp.log", "a") as f:
+				f.write(f"Error connecting RPC: {e}\n")
 
-def _handle_order(order: str):
+def _handle_order(order: str) -> str:
 	if order == "stop":
 		sys.exit(0)
+		return "Stopping daemon"
 	elif order == "status":
-		client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-		client.connect(SOCKET_PATH)
-		client.send("status from daemon".encode())
-		client.close()
+		return rp.config.__str__()
+	elif order == "update":
+		_update_presence()
+		return "Presence updated"
 	else:
-		client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-		client.connect(SOCKET_PATH)
-		client.send(f"unknown order {order}".encode())
-		client.close()
+		return "Unknown command"
 
 def daemonize():
 	try:
-		with open(PID_FILE, "r") as f:
+		with open(rp.PID_FILE, "r") as f:
 			_pid: int = int(f.read().strip())
-			if os.kill(_pid, 0) == 0:
+			try:
+				os.kill(_pid, 0)
 				print(f"Daemon already running with PID {_pid}.")
 				sys.exit(1)
+			except ProcessLookupError:
+				pass
 	except FileNotFoundError:
 		pass
 	pid: int = os.fork()
@@ -53,16 +56,15 @@ def daemonize():
 
 	# _mute_streams()
 
-	with open(PID_FILE, "w") as f:
+	with open(rp.PID_FILE, "w+") as f:
 		f.write(str(os.getpid()))
 	
-	if os.path.exists(SOCKET_PATH):
-		os.remove(SOCKET_PATH)
+	_update_presence()
+	if os.path.exists(rp.SOCKET_PATH):
+		os.remove(rp.SOCKET_PATH)
 	server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-	server.bind(SOCKET_PATH)
+	server.bind(rp.SOCKET_PATH)
 	server.listen(1)
-
-	print("Daemon started")
 
 	while True:
 		conn, _ = server.accept()
@@ -70,8 +72,13 @@ def daemonize():
 			print("Client connected")
 			data = conn.recv(1024)
 			if not data:
-				break
-			_handle_order(data.decode().strip())
+				continue
+			
+			conn.sendall(_handle_order(data.decode().strip()).encode())
+
+
+def start():
+	daemonize()
 
 def main():
 	while True:

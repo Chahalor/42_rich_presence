@@ -1,18 +1,23 @@
+PYTHON	:= python3
+MAIN	:= main.py
 
-
-run:
-	bash run.sh
+start:
+	$(PYTHON) $(MAIN) start
 
 stop:
-	bash stop.sh
+	$(PYTHON) $(MAIN) stop
+
+status:
+	$(PYTHON) $(MAIN) status
+
+uninstall:
+	pip uninstall -r requirements.txt
 
 install:
 	pip install -r requirements.txt
 
 update:
-	git pull
+	$(PYTHON) $(MAIN) update
 
-uninstall:
-	pip uninstall -r requirements.txt
 
-.PHONY: run stop install update uninstall
+.PHONY: start stop status install update uninstall

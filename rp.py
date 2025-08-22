@@ -55,7 +55,7 @@ user = response.json()
 print(json.dumps(response.json(), indent=4))
 
 start = int(time.time())
-RPC = Presence("1383806236763623496")
+RPC = Presence("1408374003411849216")
 RPC.connect()
 print("RPC is online")
 
